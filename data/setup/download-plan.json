@@ -1,0 +1,26 @@
+{
+  "status": "PINNED_DOWNLOAD_PLAN",
+  "purpose": "Vaani inference smoke before real-data pilot",
+  "destination": "models/upstream",
+  "sources": [
+    {
+      "repository": "ARTPARK-IISc/Vaani-LID_v0",
+      "revision": "df5a1394996671df3234ee23257d3259a40058fd",
+      "license": "mit",
+      "weight_bytes": 3238301412,
+      "weight_sha256": "ed193d4cd317380b8e8c6ceeb61da5fd62fba0f49eab41a1a64ecd77c749cde6"
+    },
+    {
+      "repository": "openai/whisper-large-v3-turbo",
+      "revision": "41f01f3fe87f28c78e2fbf8b568835947dd65ed9",
+      "license": "mit",
+      "weight_bytes": 1617824864
+    }
+  ],
+  "total_weight_bytes": 4856126276,
+  "estimated_peak_disk_allowance_bytes": 12884901888,
+  "notes": [
+    "Official pinned repositories and Hugging Face managed storage.",
+    "Files are checked before local inference."
+  ]
+}

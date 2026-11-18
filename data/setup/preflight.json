@@ -1,0 +1,258 @@
+{
+  "upstream": {
+    "sources": {
+      "vaani": {
+        "status": "metadata_verified",
+        "model_id": "ARTPARK-IISc/Vaani-LID_v0",
+        "revision": "df5a1394996671df3234ee23257d3259a40058fd",
+        "license": "mit",
+        "files": [
+          {
+            "path": ".gitattributes",
+            "size": 1519,
+            "sha256": null
+          },
+          {
+            "path": "README.md",
+            "size": 2582,
+            "sha256": null
+          },
+          {
+            "path": "config.json",
+            "size": 2159,
+            "sha256": null
+          },
+          {
+            "path": "model.safetensors",
+            "size": 3238301412,
+            "sha256": "ed193d4cd317380b8e8c6ceeb61da5fd62fba0f49eab41a1a64ecd77c749cde6"
+          },
+          {
+            "path": "modeling_whisper_lid.py",
+            "size": 10425,
+            "sha256": null
+          },
+          {
+            "path": "preprocessor_config.json",
+            "size": 357,
+            "sha256": null
+          }
+        ],
+        "labels": {
+          "0": "Surjapuri",
+          "1": "Marathi",
+          "2": "Assamese",
+          "3": "Haryanvi",
+          "4": "Halbi",
+          "5": "Malayalam",
+          "6": "Maithili",
+          "7": "Wancho",
+          "8": "Chhattisgarhi",
+          "9": "Punjabi",
+          "10": "Magahi",
+          "11": "Nepali",
+          "12": "Garhwali",
+          "13": "Garo",
+          "14": "Khortha",
+          "15": "Sumi",
+          "16": "Bajjika",
+          "17": "Marwari",
+          "18": "Telugu",
+          "19": "Nagamese",
+          "20": "Tulu",
+          "21": "Odia",
+          "22": "Urdu",
+          "23": "Kumaoni",
+          "24": "Kannada",
+          "25": "Tamil",
+          "26": "Sambalpuri",
+          "27": "Bengali",
+          "28": "Rajasthani",
+          "29": "English",
+          "30": "Malvani",
+          "31": "Chakma",
+          "32": "Surgujia",
+          "33": "Kokborok",
+          "34": "Khariboli",
+          "35": "Hindi",
+          "36": "Kurukh",
+          "37": "Angika",
+          "38": "Sadri",
+          "39": "Bhojpuri",
+          "40": "Konkani",
+          "41": "Gujarati"
+        },
+        "label_count": 42,
+        "code_sha256": "19201cca9129570c35fe252f1b4bcb5ec6187f225876250a29dce63176b16577",
+        "code_review": "PENDING: read recorded source before any execution",
+        "constructor_base_model": "openai/whisper-large-v3-turbo",
+        "base_revision": "41f01f3fe87f28c78e2fbf8b568835947dd65ed9",
+        "base_files": [
+          {
+            "path": ".gitattributes",
+            "size": 1519
+          },
+          {
+            "path": "README.md",
+            "size": 21196
+          },
+          {
+            "path": "added_tokens.json",
+            "size": 34648
+          },
+          {
+            "path": "config.json",
+            "size": 1256
+          },
+          {
+            "path": "generation_config.json",
+            "size": 3772
+          },
+          {
+            "path": "merges.txt",
+            "size": 493869
+          },
+          {
+            "path": "model.safetensors",
+            "size": 1617824864
+          },
+          {
+            "path": "normalizer.json",
+            "size": 52666
+          },
+          {
+            "path": "preprocessor_config.json",
+            "size": 340
+          },
+          {
+            "path": "special_tokens_map.json",
+            "size": 2186
+          },
+          {
+            "path": "tokenizer.json",
+            "size": 2710337
+          },
+          {
+            "path": "tokenizer_config.json",
+            "size": 282843
+          },
+          {
+            "path": "vocab.json",
+            "size": 1036558
+          }
+        ],
+        "inference_smoke": "NOT RUN",
+        "weights_downloaded": false
+      },
+      "fleurs": {
+        "status": "metadata_verified",
+        "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+        "license": [
+          "cc-by-4.0"
+        ],
+        "language_archives": {
+          "en_us": [
+            {
+              "path": "data/en_us/audio/dev.tar.gz",
+              "size": 171250900,
+              "sha256": "2658fda72f199e12676ecac9415094667a4e14e149b146e568ea00b2a2f0954c"
+            },
+            {
+              "path": "data/en_us/audio/test.tar.gz",
+              "size": 289851356,
+              "sha256": "d9c2e37b41aacd41bc283554a0a82b5476b36887049774ecb2819dcaaa55a356"
+            },
+            {
+              "path": "data/en_us/audio/train.tar.gz",
+              "size": 1380572241,
+              "sha256": "5f4491948c2bd29ac00f4b8afae2378f0a1dcdde4041b5cd284a80dff01fa9f5"
+            }
+          ],
+          "hi_in": [
+            {
+              "path": "data/hi_in/audio/dev.tar.gz",
+              "size": 131741732,
+              "sha256": "9adbca6d6fc70e40c121910941bcd7c8906eee60b402b6d21b4bd160e20030c7"
+            },
+            {
+              "path": "data/hi_in/audio/test.tar.gz",
+              "size": 249331325,
+              "sha256": "47c238b9cf7016ba596639bb3038b0c89dc6e85759f16d09c4f58c6dfa25c65f"
+            },
+            {
+              "path": "data/hi_in/audio/train.tar.gz",
+              "size": 1256867167,
+              "sha256": "bb6f52bfb27ca91c54539480111163eb9245305008cfe0526c6f4af3bfdd04e9"
+            }
+          ],
+          "ta_in": [
+            {
+              "path": "data/ta_in/audio/dev.tar.gz",
+              "size": 238893728,
+              "sha256": "63faa53c804949dae73c9a953927fb50d59540830261cff374588ba4c901f09e"
+            },
+            {
+              "path": "data/ta_in/audio/test.tar.gz",
+              "size": 406616353,
+              "sha256": "244344ef4ca6ee0d9a0a4815686ab633ec2e8d0b70dcb7f63d53033266b99d6e"
+            },
+            {
+              "path": "data/ta_in/audio/train.tar.gz",
+              "size": 1638765342,
+              "sha256": "89ea516b1115d8cc7419ae5c44a35f356cb65fdd0480e3b799b1c02fdfdeab37"
+            }
+          ],
+          "bn_in": [
+            {
+              "path": "data/bn_in/audio/dev.tar.gz",
+              "size": 278667778,
+              "sha256": "b7f380b67d50bc59f328af3e1bd8096ab9e728bd0103349b9746ca95ab75ff30"
+            },
+            {
+              "path": "data/bn_in/audio/test.tar.gz",
+              "size": 659700249,
+              "sha256": "6c1cc66b258b711d49e5bcd8e5508c18484c8cbcbe76d323ad46947756029b0f"
+            },
+            {
+              "path": "data/bn_in/audio/train.tar.gz",
+              "size": 2034709059,
+              "sha256": "27199ad0041edeb5efe16948718b866c2417f4c88c2eeadebdadf269a041ab8f"
+            }
+          ],
+          "te_in": [
+            {
+              "path": "data/te_in/audio/dev.tar.gz",
+              "size": 166827973,
+              "sha256": "2ac52fa35be22b05ad041e2a2a443d10f4ef59449db07fe42cd644eb81ed7123"
+            },
+            {
+              "path": "data/te_in/audio/test.tar.gz",
+              "size": 270257144,
+              "sha256": "65d764ab4c3e9531eb61ffea4d0a78832d520f238ef0f339a7871f19c1653fd8"
+            },
+            {
+              "path": "data/te_in/audio/train.tar.gz",
+              "size": 1502869666,
+              "sha256": "6098b3d50ae7b49f9ddaac9b3f84aa7a36701ef196859a34b9b85cc9111a09f1"
+            }
+          ]
+        },
+        "route": "per-official-split tar.gz; subset transfer feasibility NOT RUN",
+        "streaming_saves_bytes": "NOT ASSUMED",
+        "recording_id_uniqueness": "NOT RUN",
+        "speaker_metadata": "NOT RUN",
+        "audio_decode": "NOT RUN"
+      },
+      "musan": {
+        "status": "official_page_accessible",
+        "license": "CC BY 4.0",
+        "full_archive_planning_bytes": 11000000000,
+        "route": "official page offers full archive; genuine small subset route NOT VERIFIED",
+        "downloaded": false,
+        "fallback": null
+      }
+    },
+    "blockers": [],
+    "metadata_bytes": 350468
+  }
+}

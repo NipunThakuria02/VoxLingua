@@ -1,0 +1,34 @@
+{
+  "speech": {
+    "name": "Google FLEURS",
+    "url": "https://huggingface.co/datasets/google/fleurs",
+    "license": "CC-BY-4.0",
+    "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+    "configurations": [
+      "en_us",
+      "hi_in",
+      "ta_in",
+      "bn_in",
+      "te_in"
+    ]
+  },
+  "production_noise": {
+    "name": "MUSAN",
+    "url": "https://www.openslr.org/17/",
+    "license": "CC-BY-4.0",
+    "repack": {
+      "repository": "corypaik/musan",
+      "revision": "76f9882cfa4475efe11508ac9aa32722f84ca5b7",
+      "shard": "noise/train-00001-of-00002.parquet",
+      "shard_url": "https://huggingface.co/datasets/corypaik/musan/resolve/76f9882cfa4475efe11508ac9aa32722f84ca5b7/noise/train-00001-of-00002.parquet",
+      "shard_sha256": "8178d69f8b052c5986c0a7d30c0f718885132a1c7cdae97a7c8f1a3e2523972c",
+      "distribution": "Community Parquet repack of MUSAN, with original noise paths",
+      "transfer_bytes": 0
+    }
+  },
+  "pilot_noise": {
+    "name": "ESC-10",
+    "url": "https://github.com/karolpiczak/ESC-50",
+    "license": "CC-BY-3.0"
+  }
+}

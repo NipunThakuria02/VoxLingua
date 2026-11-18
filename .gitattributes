@@ -1,0 +1,6 @@
+* text=auto
+*.png binary
+*.ttf binary
+*.zip binary
+# Preserve the extractor bytes used by saved model integrity checks.
+/src/voxlingua/features.py -text

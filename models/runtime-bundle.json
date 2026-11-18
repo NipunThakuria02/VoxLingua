@@ -1,0 +1,10 @@
+{
+  "filename": "VoxLingua-Runtime-Models.zip",
+  "sha256": "268797b0089546b9f64e24f7707ab78a08f5edbacf9a5a7e8ea706250b0b83f7",
+  "run_id": "20261115-192519-nogit-s20261115",
+  "original_artifact_manifest_sha256": "fa4d05893e85ed477d73df09fa0987b158c886ee4bf614729d9c0909947bf6cb",
+  "original_metrics_sha256": "ee5a42e41b4d1d1bfd94d24f1256eb8b7ff43a5edf0e5dae11eec2556ca5e9ba",
+  "contents": "Trained distortion models, schemas, parity evidence and sealed evaluation",
+  "upstream_snapshots": "Provision separately using the pinned upstream download workflow",
+  "feature_extractor_sha256": "bc4fccd26a3c46199c5643d22e58a0fa6ffcb5fecbf21e46332f44dd9eda8d10"
+}

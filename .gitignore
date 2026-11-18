@@ -1,0 +1,55 @@
+# Python environments and caches
+.venv*/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.cache/
+.wheelhouse/
+build/
+dist/
+.coverage
+htmlcov/
+# Machine settings
+.env
+.env.*
+!.env.example
+configs/runtime.local.yaml
+.streamlit/secrets.toml
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+# Raw audio, recordings and datasets
+*.wav
+*.flac
+*.mp3
+*.webm
+*.ogg
+*.m4a
+*.parquet
+*.tar
+*.gz
+*.zip
+/data/*
+!/data/README.md
+!/data/sources.json
+!/data/setup/
+# Local models
+/models/*
+!/models/README.md
+!/models/runtime-bundle.json
+*.joblib
+*.pkl
+*.pickle
+*.safetensors
+*.pt
+*.pth
+*.npz
+# Local evaluation artifacts and acquisition evidence
+/results/*
+!/results/README.md
+!/results/published/
+!/results/report-figures/

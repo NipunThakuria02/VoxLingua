@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+@font-face{font-family:Montserrat;src:url('/app/static/fonts/Montserrat.ttf');font-weight:100 900}
+*{box-sizing:border-box}
+body{margin:0;background:transparent;color:#ededeb;font:11px Montserrat,Arial,sans-serif}
+button{font:500 11px Montserrat,sans-serif;background:#c6d1c0;border:1px solid #c6d1c0;color:#121212;padding:12px 17px;border-radius:6px;cursor:pointer}
+button:focus-visible{outline:2px solid white;outline-offset:3px}
+button[disabled]{opacity:.4;cursor:default}
+.row{display:flex;align-items:center;gap:14px}
+#clock{font:11px monospace;color:#aaa;margin-left:auto}
+#status,#input{color:#aaa;margin:8px 0;min-height:16px;line-height:1.5;overflow-wrap:anywhere}
+canvas{width:100%;height:108px;display:block}
+meter{width:100%;height:12px;accent-color:#c6d1c0}
+.error{color:#e3bd8d!important}
+</style>
+</head>
+<body>
+<div class="row">
+  <button id="record">● Record audio</button>
+  <span id="clock">00:00 / 00:15</span>
+</div>
+<div id="monitor" hidden>
+  <div id="input"></div>
+  <meter id="level" min="-60" max="0" low="-42" high="-10" optimum="-18" value="-60" aria-label="Microphone input level"></meter>
+</div>
+<canvas id="bars" aria-hidden="true"></canvas>
+<div id="status" role="status" aria-live="polite">Microphone starts only when you choose Record audio.</div>
+<script>
+const MAX_SECONDS = 15;
+const MIN_SIGNAL_RANGE = 0.002;
+const NO_SIGNAL = 'No usable microphone signal. Check the mute switch and selected input in your browser and Windows Sound settings, then try again.';
+const send = (type, extra = {}) => parent.postMessage({isStreamlitMessage: true, type, ...extra}, '*');
+const emit = value => send('streamlit:setComponentValue', {value, dataType: 'json'});
+const button = document.getElementById('record');
+const clock = document.getElementById('clock');
+const monitor = document.getElementById('monitor');
+const input = document.getElementById('input');
+const level = document.getElementById('level');
+const status = document.getElementById('status');
+const canvas = document.getElementById('bars');
+const ctx = canvas.getContext('2d');
+
+let args = {}, busy = false, active = null;
+let frame = 0;
+
+function layout() {
+  canvas.style.display = args.compact && !active ? 'none' : 'block';
+  send('streamlit:setFrameHeight', {height: Math.max(85, document.body.getBoundingClientRect().height + 16)});
+}
+function message(value, error = false) {
+  status.textContent = value;
+  status.className = error ? 'error' : '';
+  layout();
+}
+function resize() {
+  const scale = devicePixelRatio || 1;
+  canvas.width = innerWidth * scale;
+  canvas.height = 108 * scale;
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  draw();
+  layout();
+}
+function draw() {
+  cancelAnimationFrame(frame);
+  ctx.clearRect(0, 0, innerWidth, 108);
+  const radius = Math.min(112, innerWidth * 0.35);
+  const bins = active?.bins;
+  if (bins && !args.reduced) active.analyser.getByteFrequencyData(bins);
+  for (let i = 0; i < 80; i++) {
+    const angle = i / 80 * Math.PI * 2;
+    const x = innerWidth / 2 + Math.cos(angle) * radius;
+    const y = 73 + Math.sin(angle) * radius * 0.23;
+    const height = bins && !args.reduced ? 3 + bins[i] / 255 * 50 : 5;
+    ctx.strokeStyle = bins ? 'rgba(219,229,232,.66)' : '#626862';
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y - height);
+    ctx.stroke();
+  }
+  if (bins && !args.reduced) frame = requestAnimationFrame(draw);
+}
+function wavBase64(chunks, count, rate) {
+  const bytes = new Uint8Array(44 + count * 2);
+  const view = new DataView(bytes.buffer);
+  const ascii = (offset, value) => bytes.set(Array.from(value, char => char.charCodeAt(0)), offset);
+  ascii(0, 'RIFF');
+  view.setUint32(4, bytes.length - 8, true);
+  ascii(8, 'WAVE');
+  ascii(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, rate, true);
+  view.setUint32(28, rate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  ascii(36, 'data');
+  view.setUint32(40, count * 2, true);
+  let offset = 44;
+  for (const chunk of chunks) {
+    for (const sample of chunk) {
+      view.setInt16(offset, Math.round(Math.max(-1, Math.min(32767 / 32768, sample)) * 32768), true);
+      offset += 2;
+    }
+  }
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 32768) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 32768));
+  }
+  return btoa(binary);
+}
+function release(capture) {
+  if (active === capture) active = null;
+  clearInterval(capture.timer);
+  if (capture.track) capture.track.onended = null;
+  capture.stream?.getTracks().forEach(track => track.stop());
+  if (capture.node) {
+    capture.node.onprocessorerror = null;
+    capture.node.port.close();
+    capture.node.disconnect();
+  }
+  capture.source?.disconnect();
+  capture.analyser?.disconnect();
+  if (capture.audio.state !== 'closed') capture.audio.close().catch(() => {});
+}
+function resetButton() {
+  busy = false;
+  button.disabled = Boolean(args.disabled);
+  button.textContent = '● Record again';
+  monitor.hidden = true;
+  draw();
+}
+function fail(capture, reason) {
+  if (capture) release(capture);
+  resetButton();
+  message(reason, true);
+  emit({state: 'error', message: reason});
+}
+function stop(capture) {
+  if (capture !== active) return;
+  const seconds = capture.count / capture.audio.sampleRate;
+  if (capture.count === 0 || (seconds >= 1 && capture.high - capture.low < MIN_SIGNAL_RANGE)) {
+    fail(capture, NO_SIGNAL);
+    return;
+  }
+  if (seconds < 1) {
+    fail(capture, 'Capture at least one second of audio. Speak for 5–10 seconds before stopping.');
+    return;
+  }
+  const audioBase64 = wavBase64(capture.chunks, capture.count, capture.audio.sampleRate);
+  release(capture);
+  resetButton();
+  message('Recording ready · ' + seconds.toFixed(1) + ' seconds. Play it back below.');
+  emit({state: 'ready', audio_base64: audioBase64, filename: 'microphone.wav', duration_s: seconds});
+}
+function receive(capture, block) {
+  if (capture !== active) return;
+  const left = MAX_SECONDS * capture.audio.sampleRate - capture.count;
+  const chunk = block.subarray(0, left);
+  let lo = Infinity, hi = -Infinity;
+  for (const sample of chunk) {
+    lo = Math.min(lo, sample);
+    hi = Math.max(hi, sample);
+  }
+  capture.low = Math.min(capture.low, lo);
+  capture.high = Math.max(capture.high, hi);
+  capture.recentRange = Math.max(capture.recentRange, hi - lo);
+  capture.chunks.push(chunk);
+  capture.count += chunk.length;
+  if (capture.count === MAX_SECONDS * capture.audio.sampleRate) stop(capture);
+}
+function updateMeter(capture) {
+  const seconds = Math.floor(capture.count / capture.audio.sampleRate);
+  const elapsed = performance.now() - capture.started;
+  clock.textContent = '00:' + String(seconds).padStart(2, '0') + ' / 00:15';
+  level.value = Math.max(-60, 20 * Math.log10(capture.recentRange / 2));
+  capture.recentRange = 0;
+  const noSignal = capture.high - capture.low < MIN_SIGNAL_RANGE;
+  const recordingMessage = elapsed > 1600 && noSignal ? NO_SIGNAL : 'Recording locally. Speak and watch the input meter move.';
+  if (status.textContent !== recordingMessage) message(recordingMessage, elapsed > 1600 && noSignal);
+  if (elapsed >= 15500) stop(capture);
+}
+function errorMessage(error) {
+  if (error.name === 'NotAllowedError') return 'Microphone permission denied. Allow it in your browser and try again.';
+  if (error.name === 'NotFoundError') return 'No microphone found. Connect or enable an input device and try again.';
+  if (error.name === 'NotReadableError') return 'The browser could not open the microphone. Check whether another app is using it.';
+  return 'Could not start the microphone. ' + error.message;
+}
+
+button.addEventListener('click', async () => {
+  if (active?.started) {
+    stop(active);
+    return;
+  }
+  busy = true;
+  button.disabled = true;
+  message('Requesting microphone access…');
+  let capture;
+  try {
+    if (!navigator.mediaDevices?.getUserMedia || !window.AudioContext) {
+      throw new Error('Open VoxLingua on localhost in Chrome or Edge, or upload a WAV file.');
+    }
+    const audio = new AudioContext();
+    capture = {audio, chunks: [], count: 0, recentRange: 0, low: Infinity, high: -Infinity};
+    active = capture;
+    const resumed = audio.resume().then(() => null, error => error);
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: false,
+      audio: {channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false},
+    });
+    if (capture !== active) {
+      stream.getTracks().forEach(track => track.stop());
+      return;
+    }
+    capture.stream = stream;
+    capture.track = stream.getAudioTracks()[0];
+    if (!capture.track) throw new Error('The selected device returned no audio track.');
+    if (!audio.audioWorklet) throw new Error('This browser does not support the local capture engine.');
+    await audio.audioWorklet.addModule(new URL('capture-processor.js?v=1', location.href));
+    const resumeError = await resumed;
+    if (capture !== active) return;
+    if (resumeError) throw resumeError;
+    if (capture.track.readyState !== 'live') throw new Error('The microphone disconnected.');
+    capture.source = audio.createMediaStreamSource(stream);
+    capture.analyser = audio.createAnalyser();
+    capture.analyser.fftSize = 256;
+    capture.bins = new Uint8Array(capture.analyser.frequencyBinCount);
+    capture.node = new AudioWorkletNode(audio, 'voxlingua-capture', {
+      channelCount: 1, channelCountMode: 'explicit', outputChannelCount: [1],
+    });
+    capture.node.port.onmessage = event => receive(capture, event.data);
+    capture.node.onprocessorerror = () => fail(capture, 'The browser stopped processing microphone audio. Try recording again.');
+    capture.track.onended = () => fail(capture, 'The microphone disconnected. Reconnect it and try again.');
+    capture.source.connect(capture.analyser);
+    capture.source.connect(capture.node);
+    capture.node.connect(audio.destination);
+    input.textContent = 'Input · ' + (capture.track.label || 'Browser default microphone');
+    monitor.hidden = false;
+    level.value = -60;
+    clock.textContent = '00:00 / 00:15';
+    button.textContent = '■ Stop recording';
+    capture.started = performance.now();
+    capture.timer = setInterval(() => updateMeter(capture), 100);
+    busy = false;
+    button.disabled = Boolean(args.disabled);
+    message('Recording locally. Speak and watch the input meter move.');
+    draw();
+    emit({state: 'recording'});
+  } catch (error) {
+    if (!capture || capture === active) fail(capture, errorMessage(error));
+  }
+});
+addEventListener('message', event => {
+  if (event.source !== parent || event.data?.type !== 'streamlit:render') return;
+  args = event.data.args || {};
+  button.disabled = busy || Boolean(args.disabled);
+  draw();
+  layout();
+});
+addEventListener('resize', resize);
+addEventListener('pagehide', () => {
+  if (active) release(active);
+  cancelAnimationFrame(frame);
+});
+send('streamlit:componentReady', {apiVersion: 1});
+resize();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# Copy to runtime.local.yaml and set your local snapshot directory.
+audio: {max_seconds: 15.0, min_seconds: 1.0, max_bytes: 20971520}
+models_dir: ../models
+upstream_models: ../models/upstream
+language_enabled: true

@@ -1,0 +1,28 @@
+seed: 20261115
+run_kind: pilot
+audio:
+  max_seconds: 15.0
+  min_seconds: 1.0
+  max_bytes: 20971520
+features:
+  schema: fs-v1
+  sample_rate: 16000
+  frame: 400
+  hop: 160
+  n_fft: 512
+acquisition:
+  max_minutes: 45
+  max_transfer_gib: 6
+  approval_threshold_mib: 500
+data:
+  languages: [en_us, hi_in, ta_in, bn_in, te_in]
+  pilot_originals: 40
+training:
+  cv_folds: 3
+  n_jobs: 2
+  deployment_model: stacking
+  voting_weights: equal
+language:
+  model_id: ARTPARK-IISc/Vaani-LID_v0
+  revision: df5a1394996671df3234ee23257d3259a40058fd
+  prefer_gpu_fp16: true
